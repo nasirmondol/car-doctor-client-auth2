@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect } from "react";
 
 const axiosSecure = axios.create({
-    baseURL: 'http://localhost:5000',
+    baseURL: 'https://car-doctor-server-one-neon.vercel.app',
     withCredentials: true,
 })
 const useAxiosSecure = () => {
@@ -11,10 +11,9 @@ const useAxiosSecure = () => {
         axiosSecure.interceptors.response.use(res => {
             return res;
         }, error => {
-            console.log('helo')
             console.log('Error tracked in the interceptor', error.response)
         })
-    }, [axiosSecure]);
+    }, []);
     return axiosSecure;
 };
 
