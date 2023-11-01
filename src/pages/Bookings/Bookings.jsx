@@ -1,17 +1,24 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import BookingRow from "./BookingRow";
+import useAxiosSecure from "../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 const Bookings = () => {
     const { user } = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
+    const axiosSecure = useAxiosSecure();
 
-    const url = `http://localhost:5000/bookings?email=${user?.email}`;
+    const url = `/bookings?email=${user?.email}`;
+
     useEffect(() => {
-        fetch(url)
-            .then(res => res.json())
-            .then(data => setBookings(data))
-    }, [url]);
+        // fetch(url, { credentials: 'include' })
+        //     .then(res => res.json())
+        //     .then(data => setBookings(data))
+        axiosSecure.get(url)
+            .then(res => setBookings(res.data))
+    }, [url, axiosSecure, user.email]);
+    console.log(bookings)
 
     const handleDelete = id => {
         const proceed = confirm('Are You sure you want to delete');
@@ -23,9 +30,13 @@ const Bookings = () => {
                 .then(data => {
                     console.log(data);
                     if (data.deletedCount > 0) {
-                        alert('deleted successful');
                         const remaining = bookings.filter(booking => booking._id !== id);
                         setBookings(remaining);
+                        Swal.fire(
+                            'Good job!',
+                            'You clicked the button!',
+                            'success'
+                          )
                     }
                 })
         }
@@ -75,7 +86,7 @@ const Bookings = () => {
                     </thead>
                     <tbody>
                         {
-                            bookings.map(booking => <BookingRow
+                            bookings?.map(booking => <BookingRow
                                 key={booking._id}
                                 booking={booking}
                                 handleDelete={handleDelete}
